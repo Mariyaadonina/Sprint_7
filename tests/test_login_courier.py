@@ -18,14 +18,11 @@ class TestLoginCourier:
     @allure.description(
         'Проверить успешность авторизации курьера: с id курьера в ответе - позитивный сценарий')
     def test_successful_login_courier_message(self, new_couriers_and_clear_courier_data):
-
         body = new_couriers_and_clear_courier_data['data']
         login_request = SamokatApi.login_courier(body)
-        try:
-            courier_id = login_request.json()['id']
-        except KeyError:
-            courier_id = ""
-        assert login_request.status_code == 200 and courier_id != ''
+        assert login_request.status_code == 200
+        courier_id = login_request.json().get('id')
+        assert courier_id is not None
 
 
     @allure.title('Проверка НЕуспешной авторизации курьера с ошибкой в логине - код об ошибке 404')
@@ -116,6 +113,5 @@ class TestLoginCourier:
     @allure.description(
         'Проверить НЕуспешность авторизации курьера с передачей в запрос не всех обязательных полей: код ответа не 201 - негативный сценарий')
     def test_failed_login_courier_not_all_fields(self):
-
         login_request = SamokatApi.login_courier(TestAuthorizationData.LOGIN_COURIER_BODY_NOT_ALL_FIELDS)
-        assert login_request.status_code != 201
+        assert login_request.status_code == 400

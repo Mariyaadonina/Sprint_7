@@ -16,7 +16,7 @@ def new_couriers_and_clear_courier_data():
     try:
         courier_id = login_request.json()['id']
     except KeyError:
-        courier_id = " "
+        courier_id = ""
 
     # формирование данных курьера
     courier_data = {
@@ -31,3 +31,14 @@ def new_couriers_and_clear_courier_data():
 
     # удаление курьера
     SamokatApi.delete_courier(courier_id)
+
+
+@allure.step('Фикстура: Создание заказа, удаление заказа после выполнения теста')
+@pytest.fixture(scope='function')
+def cancel_order_fixture():
+    order_track_data = {}
+
+    yield order_track_data
+
+    if 'track' in order_track_data:
+        SamokatApi.cancel_order(order_track_data['track'])

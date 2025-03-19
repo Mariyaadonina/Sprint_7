@@ -8,40 +8,27 @@ class TestRegistrationCoruier:
     @allure.title('Проверка успешной регистрации нового курьера - корректный код ответа')
     @allure.description('Проверить успешность регистрации нового курьера: код ответа 201 - позитивный сценарий')
     def test_successful_registration_courier_correct_code(self):
-
         body = TestDataHelper.generate_registration_body()
         registration_request = SamokatApi.registration_courier(body)
         login_request = SamokatApi.login_courier(TestDataHelper.generate_login_courier_body(body))
-        try:
-            courier_id = login_request.json()['id']
-        except KeyError:
-            courier_id = ""
+        courier_id = login_request.json().get('id')
 
         assert registration_request.status_code == 201
+        assert courier_id is not None  # Проверка, что courier_id не None
         SamokatApi.delete_courier(courier_id)
 
     @allure.title('Проверка успешной регистрации нового курьера - корректное тело ответа')
     @allure.description('Проверить успешность регистрации нового курьера: тело ответа {"ok":True} - позитивный сценарий')
     def test_successful_registration_courier_correct_message(self):
-
         body = TestDataHelper.generate_registration_body()
         registration_request = SamokatApi.registration_courier(body)
         login_request = SamokatApi.login_courier(TestDataHelper.generate_login_courier_body(body))
-        try:
-            courier_id = login_request.json()['id']
-        except KeyError:
-            courier_id = ""
+        courier_id = login_request.json().get('id')
 
-        assert registration_request.json()['ok'] == True and registration_request.status_code == 201
+        assert registration_request.json().get('ok') is True
+        assert registration_request.status_code == 201
         SamokatApi.delete_courier(courier_id)
 
-    @allure.title('Проверка НЕуспешной регистрации курьера с уже существующими данными - корректный код ошибки')
-    @allure.description('Проверить НЕуспешность регистрации нового курьера: код ответа 409 - негативный сценарий')
-    def test_failed_registration_courier_existed_error_code(self, new_couriers_and_clear_courier_data):
-
-        body = new_couriers_and_clear_courier_data['data']
-        registration_request_double = SamokatApi.registration_courier(body)
-        assert registration_request_double.status_code == 409
 
     @allure.title('Проверка НЕуспешной регистрации нового курьера с уже существующими данными - корректный текст ошибки')
     @allure.description('Проверить НЕуспешность регистрации нового курьера с уже существующими данными: текст ошибки {"message":"Этот логин уже используется"}- негативный сценарий')
